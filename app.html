@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> <meta name="google-site-verification" content="bR7AgqtXIyOjxM5pf8aPgDar_XpHiB4qxjWhoxy6s3s" />
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARFAM IG DOWNLOADER – App</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--c-bg:#04040a;
+--c-surface:#0b0b18;
+--c-glass:rgba(255,255,255,0.04);
+--c-glass2:rgba(255,255,255,0.07);
+--c-border:rgba(255,255,255,0.08);
+--c-neon:#a259ff;
+--c-neon2:#ff6ef7;
+--c-cyan:#00e5ff;
+--c-green:#39ff8f;
+--c-red:#ff4d6a;
+--c-text:#e8e8f0;
+--c-muted:#7a7a9a;
+--font-display:'Syne',sans-serif;
+--font-body:'DM Sans',sans-serif;
+}
+html{overflow-x:hidden}
+body{
+background:var(--c-bg);
+color:var(--c-text);
+font-family:var(--font-body);
+min-height:100vh;
+overflow-x:hidden;
+-webkit-font-smoothing:antialiased;
+}
+body::before{
+content:'';
+position:fixed;
+inset:0;
+background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+pointer-events:none;
+z-index:0;
+opacity:0.4;
+}
+
+/* ANIMATED BG */
+.bg-mesh{
+position:fixed;
+inset:0;
+z-index:0;
+overflow:hidden;
+pointer-events:none;
+}
+.mesh-orb{
+position:absolute;
+border-radius:50%;
+filter:blur(80px);
+animation:mesh-drift 12s ease-in-out infinite alternate;
+}
+.mesh-orb-1{width:500px;height:500px;background:radial-gradient(circle,rgba(162,89,255,0.18),transparent 70%);top:-100px;right:-100px;animation-duration:14s}
+.mesh-orb-2{width:400px;height:400px;background:radial-gradient(circle,rgba(0,229,255,0.1),transparent 70%);bottom:-50px;left:-80px;animation-duration:10s;animation-delay:-5s}
+.mesh-orb-3{width:350px;height:350px;background:radial-gradient(circle,rgba(255,110,247,0.08),transparent 70%);top:40%;left:40%;animation-duration:18s;animation-delay:-3s}
+@keyframes mesh-drift{
+0%{transform:translate(0,0) scale(1)}
+100%{transform:translate(30px,40px) scale(1.1)}
+}
+
+/* MOVING GRADIENT BG */
+.bg-grid{
+position:fixed;
+inset:0;
+z-index:0;
+background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+background-size:60px 60px;
+mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%);
+pointer-events:none;
+}
+
+/* NAVBAR */
+nav{
+position:fixed;
+top:0;left:0;right:0;
+z-index:1000;
+height:60px;
+display:flex;
+align-items:center;
+padding:0 24px;
+background:rgba(4,4,10,0.8);
+backdrop-filter:blur(20px);
+-webkit-backdrop-filter:blur(20px);
+border-bottom:1px solid var(--c-border);
+}
+.nav-logo{
+display:flex;
+align-items:center;
+gap:10px;
+text-decoration:none;
+}
+.nav-logo-icon{
+width:32px;height:32px;
+background:linear-gradient(135deg,var(--c-neon),var(--c-neon2));
+border-radius:8px;
+display:flex;align-items:center;justify-content:center;
+box-shadow:0 0 20px rgba(162,89,255,0.5);
+flex-shrink:0;
+}
+.nav-logo-icon svg{width:18px;height:18px;fill:white}
+.nav-logo-text{
+font-family:var(--font-display);
+font-weight:800;
+font-size:17px;
+background:linear-gradient(135deg,var(--c-neon),var(--c-neon2));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+background-clip:text;
+letter-spacing:-0.5px;
+}
+.nav-spacer{flex:1}
+.nav-back{
+color:var(--c-muted);
+text-decoration:none;
+font-size:13px;
+display:flex;
+align-items:center;
+gap:6px;
+padding:6px 12px;
+border:1px solid var(--c-border);
+border-radius:8px;
+transition:all 0.3s;
+margin-right:12px;
+}
+.nav-back:hover{color:var(--c-text);border-color:rgba(162,89,255,0.3)}
+.nav-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* 3-DOT MENU */
+.menu-btn{
+width:44px;height:44px;
+display:flex;flex-direction:column;
+align-items:center;justify-content:center;
+gap:4px;
+cursor:pointer;
+border-radius:10px;
+border:1px solid var(--c-border);
+background:var(--c-glass);
+transition:all 0.3s;
+flex-shrink:0;
+position:relative;
+z-index:1001;
+}
+.menu-btn:hover{border-color:rgba(162,89,255,0.3);background:rgba(162,89,255,0.1)}
+.menu-dot{
+width:4px;height:4px;
+border-radius:50%;
+background:var(--c-muted);
+transition:background 0.3s;
+}
+.menu-btn:hover .menu-dot{background:var(--c-neon)}
+
+/* MODAL */
+.modal-overlay{
+position:fixed;
+inset:0;
+z-index:2000;
+background:rgba(4,4,10,0.8);
+backdrop-filter:blur(12px);
+-webkit-backdrop-filter:blur(12px);
+display:flex;
+align-items:center;
+justify-content:center;
+opacity:0;
+pointer-events:none;
+transition:opacity 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+background:rgba(11,11,24,0.95);
+border:1px solid rgba(162,89,255,0.25);
+border-radius:20px;
+padding:28px;
+width:320px;
+max-width:calc(100vw - 40px);
+box-shadow:0 0 80px rgba(162,89,255,0.2),0 40px 80px rgba(0,0,0,0.5);
+transform:scale(0.92) translateY(12px);
+transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+position:relative;
+}
+.modal-overlay.open .modal{transform:scale(1) translateY(0)}
+.modal-close{
+position:absolute;
+top:14px;right:14px;
+width:32px;height:32px;
+display:flex;align-items:center;justify-content:center;
+background:var(--c-glass2);
+border:1px solid var(--c-border);
+border-radius:8px;
+cursor:pointer;
+transition:all 0.3s;
+}
+.modal-close:hover{background:rgba(255,77,106,0.15);border-color:rgba(255,77,106,0.3)}
+.modal-close svg{width:14px;height:14px;stroke:var(--c-muted);fill:none;stroke-width:2;stroke-linecap:round}
+.modal-title{
+font-family:var(--font-display);
+font-weight:800;
+font-size:20px;
+letter-spacing:-0.5px;
+background:linear-gradient(135deg,var(--c-neon),var(--c-neon2));
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+background-clip:text;
+margin-bottom:6px;
+}
+.modal-sub{font-size:13px;color:var(--c-muted);margin-bottom:20px;line-height:1.5}
+.modal-links{display:flex;flex-direction:column;gap:10px}
+.modal-link{
+display:flex;
+align-items:center;
+gap:14px;
+padding:12px 14px;
+background:var(--c-glass);
+border:1px solid var(--c-border);
+border-radius:12px;
+text-decoration:none;
+color:var(--c-text);
+font-size:14px;
+font-weight:500;
+transition:all 0.3s cubic-bezier(0.22,1,0.36,1);
+}
+.modal-link:hover{border-color:rgba(162,89,255,0.3);background:rgba(162,89,255,0.08);transform:translateX(4px)}
+.modal-link-icon{
+width:36px;height:36px;
+border-radius:8px;
+display:flex;align-items:center;justify-content:center;
+flex-shrink:0;
+}
+.tg-icon{background:rgba(0,136,204,0.15);border:1px solid rgba(0,136,204,0.2)}
+.yt-icon{background:rgba(255,0,0,0.1);border:1px solid rgba(255,0,0,0.2)}
+.ig-icon{background:rgba(225,48,108,0.1);border:1px solid rgba(225,48,108,0.2)}
+.modal-link-icon svg{width:18px;height:18px}
+.modal-link-info{display:flex;flex-direction:column;gap:2px}
+.modal-link-name{font-weight:600;font-size:14px}
+.modal-link-handle{font-size:12px;color:var(--c-muted)}
+.modal-link-arr{margin-left:auto;width:16px;height:16px;stroke:var(--c-muted);fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0;transition:transform 0.3s,stroke 0.3s}
+.modal-link:hover .modal-link-arr{transform:translateX(3px);stroke:var(--c-neon)}
+
+/* PAGE */
+.page{
+position:relative;
+z-index:1;
+min-height:100vh;
+padding-top:60px;
+display:flex;
+flex-direction:column;
+}
+.page-header{
+text-align:center;
+padding:36px 24px 24px;
+}
+.page-tag{
+display:inline-block;
+font-size:11px;
+font-weight:600;
+letter-spacing:2px;
+text-transform:uppercase;
+color:var(--c-neon);
+background:rgba(162,89,255,0.08);
+border:1px solid rgba(162,89,255,0.2);
+padding:4px 14px;
+border-radius:100px;
+margin-bottom:12px;
+animation:fade-up 0.6s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+.page-title{
+font-family:var(--font-display);
+font-weight:800;
+font-size:clamp(26px,4vw,40px);
+letter-spacing:-1.5px;
+line-height:1.1;
+animation:fade-up 0.6s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+}
+.page-title .word{display:inline-block;overflow:hidden;vertical-align:top}
+.page-title .word span{display:inline-block;animation:word-in 0.7s cubic-bezier(0.22,1,0.36,1) both}
+.page-title .w1 span{animation-delay:0.1s}
+.page-title .w2 span{animation-delay:0.18s;background:linear-gradient(135deg,var(--c-neon),var(--c-neon2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.page-title .w3 span{animation-delay:0.26s}
+.page-title .w4 span{animation-delay:0.34s}
+@keyframes word-in{
+from{transform:translateY(100%);opacity:0}
+to{transform:translateY(0);opacity:1}
+}
+@keyframes fade-up{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1;transform:translateY(0)}
+}
+.page-sub{
+font-size:14px;
+color:var(--c-muted);
+margin-top:8px;
+animation:fade-up 0.6s 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* TOOL CONTAINER */
+.tool-wrap{
+max-width:700px;
+width:100%;
+margin:0 auto;
+padding:0 20px 48px;
+flex:1;
+}
+
+/* ANIMATED GRADIENT BORDER */
+.tool-container{
+position:relative;
+border-radius:20px;
+padding:2px;
+background:linear-gradient(135deg,var(--c-neon),var(--c-neon2),var(--c-cyan),var(--c-neon));
+background-size:300% 300%;
+animation:border-shift 4s ease infinite;
+box-shadow:0 0 60px rgba(162,89,255,0.2),0 40px 80px rgba(0,0,0,0.4);
+}
+@keyframes border-shift{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
+}
+.tool-inner{
+background:linear-gradient(135deg,rgba(11,11,24,0.98),rgba(8,8,18,0.98));
+border-radius:18px;
+padding:28px;
+position:relative;
+overflow:hidden;
+}
+.tool-inner::before{
+content:'';
+position:absolute;
+top:0;left:0;right:0;height:1px;
+background:linear-gradient(90deg,transparent,rgba(162,89,255,0.5),rgba(0,229,255,0.3),transparent);
+}
+.tool-inner::after{
+content:'';
+position:absolute;
+inset:0;
+background:radial-gradient(ellipse at 50% 0%,rgba(162,89,255,0.06),transparent 60%);
+pointer-events:none;
+}
+
+/* INPUT ROW */
+.input-row{
+display:flex;
+gap:10px;
+align-items:center;
+position:relative;
+z-index:1;
+}
+.url-input{
+flex:1;
+min-width:0;
+background:rgba(255,255,255,0.04);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:12px;
+padding:12px 16px;
+color:var(--c-text);
+font-family:var(--font-body);
+font-size:14px;
+outline:none;
+transition:all 0.3s cubic-bezier(0.22,1,0.36,1);
+caret-color:var(--c-neon);
+}
+.url-input::placeholder{color:var(--c-muted)}
+.url-input:focus{
+border-color:rgba(162,89,255,0.5);
+background:rgba(162,89,255,0.05);
+box-shadow:0 0 0 3px rgba(162,89,255,0.1),0 0 20px rgba(162,89,255,0.1);
+}
+.fetch-btn{
+flex-shrink:0;
+background:linear-gradient(135deg,var(--c-neon),var(--c-neon2));
+color:white;
+border:none;
+border-radius:12px;
+padding:12px 22px;
+font-family:var(--font-display);
+font-weight:700;
+font-size:14px;
+cursor:pointer;
+box-shadow:0 0 24px rgba(162,89,255,0.4);
+transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+display:flex;
+align-items:center;
+gap:8px;
+white-space:nowrap;
+position:relative;
+overflow:hidden;
+}
+.fetch-btn::before{
+content:'';
+position:absolute;
+inset:0;
+background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+opacity:0;
+transition:opacity 0.3s;
+}
+.fetch-btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 40px rgba(162,89,255,0.6)}
+.fetch-btn:hover::before{opacity:1}
+.fetch-btn:active{transform:translateY(0) scale(0.97)}
+.fetch-btn svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.3s}
+.fetch-btn:hover svg{transform:scale(1.1)}
+.fetch-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* LOADER */
+.loader{
+display:none;
+align-items:center;
+justify-content:center;
+padding:24px;
+gap:12px;
+}
+.loader.show{display:flex}
+.spinner{
+width:36px;height:36px;
+border-radius:50%;
+background:conic-gradient(from 0deg,var(--c-neon),var(--c-neon2),var(--c-cyan),transparent);
+animation:spin 0.8s linear infinite;
+flex-shrink:0;
+position:relative;
+}
+.spinner::after{
+content:'';
+position:absolute;
+inset:3px;
+background:var(--c-bg);
+border-radius:50%;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{font-size:14px;color:var(--c-muted)}
+
+/* ERROR */
+.error-box{
+display:none;
+align-items:center;
+gap:10px;
+background:rgba(255,77,106,0.08);
+border:1px solid rgba(255,77,106,0.25);
+border-radius:12px;
+padding:12px 16px;
+margin-top:12px;
+position:relative;
+z-index:1;
+animation:shake 0.4s cubic-bezier(0.36,0.07,0.19,0.97);
+}
+.error-box.show{display:flex}
+@keyframes shake{
+0%,100%{transform:translateX(0)}
+20%{transform:translateX(-6px)}
+40%{transform:translateX(6px)}
+60%{transform:translateX(-4px)}
+80%{transform:translateX(4px)}
+}
+.error-box svg{width:16px;height:16px;stroke:var(--c-red);fill:none;stroke-width:2;flex-shrink:0}
+.error-text{font-size:13px;color:var(--c-red);flex:1}
+
+/* PREVIEW */
+.preview-area{
+margin-top:16px;
+position:relative;
+z-index:1;
+animation:fade-in 0.4s cubic-bezier(0.22,1,0.36,1);
+display:none;
+}
+.preview-area.show{display:block}
+@keyframes fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.preview-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:12px;
+}
+.preview-label{
+font-family:var(--font-display);
+font-weight:700;
+font-size:13px;
+letter-spacing:0.5px;
+color:var(--c-neon);
+display:flex;
+align-items:center;
+gap:6px;
+}
+.preview-label::before{
+content:'';
+width:6px;height:6px;
+border-radius:50%;
+background:var(--c-green);
+box-shadow:0 0 8px var(--c-green);
+animation:pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:0.4}}
+.preview-badge{
+font-size:11px;
+font-weight:600;
+letter-spacing:0.5px;
+padding:3px 10px;
+border-radius:100px;
+background:rgba(57,255,143,0.1);
+border:1px solid rgba(57,255,143,0.2);
+color:var(--c-green);
+text-transform:uppercase;
+}
+.preview-box{
+border-radius:14px;
+overflow:hidden;
+border:1px solid var(--c-border);
+background:rgba(0,0,0,0.3);
+position:relative;
+}
+.preview-box video,
+.preview-box img{
+width:100%;
+max-height:420px;
+object-fit:contain;
+display:block;
+background:#000;
+}
+.preview-shimmer{
+position:absolute;
+top:0;left:-100%;
+width:60%;
+height:100%;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+animation:shimmer 2.5s ease-in-out infinite;
+pointer-events:none;
+}
+@keyframes shimmer{
+0%{left:-60%}
+100%{left:110%}
+}
+
+/* DOWNLOAD BTN */
+.dl-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+width:100%;
+background:linear-gradient(135deg,var(--c-green),#00c070);
+color:#000;
+border:none;
+border-radius:12px;
+padding:14px;
+font-family:var(--font-display);
+font-weight:800;
+font-size:15px;
+cursor:pointer;
+margin-top:12px;
+box-shadow:0 0 30px rgba(57,255,143,0.3);
+transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.dl-btn:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 50px rgba(57,255,143,0.5)}
+.dl-btn:active{transform:translateY(0) scale(0.98)}
+.dl-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* TIPS */
+.tips-row{
+display:flex;
+gap:10px;
+margin-top:14px;
+flex-wrap:wrap;
+}
+.tip{
+flex:1;
+min-width:0;
+background:var(--c-glass);
+border:1px solid var(--c-border);
+border-radius:10px;
+padding:12px 14px;
+display:flex;
+align-items:flex-start;
+gap:10px;
+}
+.tip-icon{
+width:28px;height:28px;
+border-radius:7px;
+background:rgba(162,89,255,0.1);
+border:1px solid rgba(162,89,255,0.15);
+display:flex;align-items:center;justify-content:center;
+flex-shrink:0;
+}
+.tip-icon svg{width:14px;height:14px;fill:none;stroke:var(--c-neon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tip-body{}
+.tip-title{font-size:12px;font-weight:600;color:var(--c-text);margin-bottom:2px;font-family:var(--font-display)}
+.tip-desc{font-size:11px;color:var(--c-muted);line-height:1.5}
+
+/* FOOTER */
+footer{
+border-top:1px solid var(--c-border);
+padding:16px 24px;
+text-align:center;
+font-size:12px;
+color:var(--c-muted);
+position:relative;
+z-index:1;
+}
+footer span{color:var(--c-neon)}
+
+@media(max-width:500px){
+.tool-inner{padding:18px}
+.tips-row{flex-direction:column}
+.page-header{padding:28px 16px 16px}
+.tool-wrap{padding:0 14px 32px}
+}
+</style>
+</head>
+    <script src="https://pl29174637.profitablecpmratenetwork.com/7f/b7/45/7fb7455d1426f164089cd6d807de53de.js"></script>
+    
+<body> <meta name="google-site-verification" content="bR7AgqtXIyOjxM5pf8aPgDar_XpHiB4qxjWhoxy6s3s" />
+    
+
+<div class="bg-mesh">
+  <div class="mesh-orb mesh-orb-1"></div>
+  <div class="mesh-orb mesh-orb-2"></div>
+  <div class="mesh-orb mesh-orb-3"></div>
+</div>
+<div class="bg-grid"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+    </div>
+    <span class="nav-logo-text">CARFAM</span>
+  </a>
+  <div class="nav-spacer"></div>
+  <a href="index.html" class="nav-back">
+    <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Home
+  </a>
+  <div class="menu-btn" id="menu-btn" aria-label="Developer Menu">
+    <div class="menu-dot"></div>
+    <div class="menu-dot"></div>
+    <div class="menu-dot"></div>
+  </div>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-close" id="modal-close">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </div>
+    <div class="modal-title">Meet Developer</div>
+    <div class="modal-sub">Connect with the creator of CARFAM IG Downloader</div>
+    <div class="modal-links">
+      <a href="https://t.me/carfam444" target="_blank" rel="noopener" class="modal-link">
+        <div class="modal-link-icon tg-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M22 2L11 13" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#0088cc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="modal-link-info">
+          <div class="modal-link-name">Telegram</div>
+          <div class="modal-link-handle">@carfam444</div>
+        </div>
+        <svg class="modal-link-arr" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="https://youtube.com/@carfam444?si=QIcsBkk0yt6BJOJD" target="_blank" rel="noopener" class="modal-link">
+        <div class="modal-link-icon yt-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.41 19.1C5.12 19.56 12 19.56 12 19.56s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.97 29 29 0 00.46-5.25 29 29 0 00-.46-5.46z" stroke="#ff0000" stroke-width="2"/>
+            <polygon points="9.75,15.02 15.5,11.75 9.75,8.48" fill="#ff0000"/>
+          </svg>
+        </div>
+        <div class="modal-link-info">
+          <div class="modal-link-name">YouTube</div>
+          <div class="modal-link-handle">@carfam444</div>
+        </div>
+        <svg class="modal-link-arr" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="https://www.instagram.com/carfamgaming7?igsh=MWEzOWo4a2FiYXdvYQ==" target="_blank" rel="noopener" class="modal-link">
+        <div class="modal-link-icon ig-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="2" width="20" height="20" rx="5" stroke="url(#ig-grad)" stroke-width="2"/>
+            <circle cx="12" cy="12" r="4" stroke="url(#ig-grad)" stroke-width="2"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="#e1306c"/>
+            <defs>
+              <linearGradient id="ig-grad" x1="2" y1="22" x2="22" y2="2">
+                <stop offset="0%" stop-color="#f09433"/>
+                <stop offset="25%" stop-color="#e6683c"/>
+                <stop offset="50%" stop-color="#dc2743"/>
+                <stop offset="75%" stop-color="#cc2366"/>
+                <stop offset="100%" stop-color="#bc1888"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="modal-link-info">
+          <div class="modal-link-name">Instagram</div>
+          <div class="modal-link-handle">@carfamgaming7</div>
+        </div>
+        <svg class="modal-link-arr" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-tag">IG Downloader Tool</div>
+    <div class="page-title">
+      <span class="word w1"><span>Instagram</span></span>&nbsp;
+      <span class="word w2"><span>Downloader</span></span>&nbsp;
+      <span class="word w3"><span>by</span></span>&nbsp;
+      <span class="word w4"><span>CARFAM</span></span>
+    </div>
+    <div class="page-sub">Paste any Instagram post or reel URL below to download instantly</div>
+  </div>
+
+  <div class="tool-wrap">
+    <div class="tool-container">
+      <div class="tool-inner">
+        <div class="input-row">
+          <input type="url" class="url-input" id="url-input" placeholder="https://www.instagram.com/p/... or reel URL" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="fetch-btn" id="fetch-btn">
+            <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M11 19A8 8 0 103 11a8 8 0 008 8z"/></svg>
+            Fetch
+          </button>
+        </div>
+
+        <div class="error-box" id="error-box">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span class="error-text" id="error-text">Please enter a valid Instagram URL.</span>
+        </div>
+
+        <div class="loader" id="loader">
+          <div class="spinner"></div>
+          <span class="loader-text">Fetching media, please wait...</span>
+        </div>
+
+        <div class="preview-area" id="preview-area">
+          <div class="preview-header">
+            <div class="preview-label">Media Ready</div>
+            <div class="preview-badge" id="media-badge">Video</div>
+          </div>
+          <div class="preview-box" id="preview-box">
+            <div class="preview-shimmer"></div>
+          </div>
+          <button class="dl-btn" id="dl-btn">
+            <svg viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4-4-4M12 4v12"/></svg>
+            Download Now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tips-row" style="margin-top:14px">
+      <div class="tip">
+        <div class="tip-icon">
+          <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div class="tip-body">
+          <div class="tip-title">Copy the URL</div>
+          <div class="tip-desc">Tap the 3-dot menu on any Instagram post and select "Copy Link"</div>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="tip-body">
+          <div class="tip-title">Public Posts Only</div>
+          <div class="tip-desc">Only public Instagram accounts can be downloaded. Private posts are not supported.</div>
+        </div>
+      </div>
+      <div class="tip">
+        <div class="tip-icon">
+          <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14M22 4L12 14.01l-3-3"/></svg>
+        </div>
+        <div class="tip-body">
+          <div class="tip-title">Supports Reels &amp; Posts</div>
+          <div class="tip-desc">Works with Instagram Reels, photo posts, and video posts in full HD quality.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Built by <span>CARFAM</span> &nbsp;&middot;&nbsp; Premium Instagram Downloader &nbsp;&middot;&nbsp; 2025
+  </footer>
+</div>
+
+<script>
+(function(){
+  var menuBtn=document.getElementById('menu-btn');
+  var overlay=document.getElementById('modal-overlay');
+  var closeBtn=document.getElementById('modal-close');
+  menuBtn.addEventListener('click',function(){overlay.classList.add('open')});
+  closeBtn.addEventListener('click',function(){overlay.classList.remove('open')});
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('open')});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')overlay.classList.remove('open')});
+
+  var urlInput=document.getElementById('url-input');
+  var fetchBtn=document.getElementById('fetch-btn');
+  var errorBox=document.getElementById('error-box');
+  var errorText=document.getElementById('error-text');
+  var loader=document.getElementById('loader');
+  var previewArea=document.getElementById('preview-area');
+  var previewBox=document.getElementById('preview-box');
+  var dlBtn=document.getElementById('dl-btn');
+  var mediaBadge=document.getElementById('media-badge');
+
+  var currentMediaUrl='';
+  var currentMediaType='';
+
+  function showError(msg){
+    errorText.textContent=msg;
+    errorBox.classList.add('show');
+    setTimeout(function(){errorBox.classList.remove('show')},5000);
+  }
+  function hideError(){errorBox.classList.remove('show')}
+  function showLoader(){loader.classList.add('show')}
+  function hideLoader(){loader.classList.remove('show')}
+
+  function clearPreview(){
+    previewArea.classList.remove('show');
+    previewBox.innerHTML='<div class="preview-shimmer"></div>';
+    currentMediaUrl='';
+    currentMediaType='';
+  }
+
+  function extractMedia(data){
+    var url='',type='image',thumb='';
+    try{
+      if(data.video_url){url=data.video_url;type='video'}
+      else if(data.url){url=data.url;type=data.type==='video'?'video':'image'}
+      else if(data.media&&data.media.video_url){url=data.media.video_url;type='video'}
+      else if(data.media&&data.media.url){url=data.media.url;type='image'}
+      else if(data.data&&Array.isArray(data.data)&&data.data.length){
+        var d=data.data[0];
+        if(d.video_url){url=d.video_url;type='video'}
+        else if(d.url){url=d.url;type='image'}
+      }
+      else if(data.urls&&Array.isArray(data.urls)&&data.urls.length){
+        url=data.urls[0];
+        type='image';
+      }
+      if(data.thumbnail)thumb=data.thumbnail;
+      if(data.thumbnail_url)thumb=data.thumbnail_url;
+      if(data.media&&data.media.thumbnail)thumb=data.media.thumbnail;
+      if(!type||type==='image'){
+        if(url&&(url.indexOf('.mp4')!==-1||url.indexOf('video')!==-1))type='video';
+      }
+    }catch(e){}
+    return{url:url,type:type,thumb:thumb};
+  }
+
+  function renderPreview(url,type,thumb){
+    previewBox.innerHTML='<div class="preview-shimmer"></div>';
+    var el;
+    if(type==='video'){
+      el=document.createElement('video');
+      el.controls=true;
+      el.setAttribute('playsinline','');
+      el.style.width='100%';
+      el.style.maxHeight='420px';
+      el.style.objectFit='contain';
+      el.style.background='#000';
+      if(thumb)el.poster=thumb;
+      var src=document.createElement('source');
+      src.src=url;
+      el.appendChild(src);
+      mediaBadge.textContent='Video';
+      mediaBadge.style.background='rgba(0,229,255,0.1)';
+      mediaBadge.style.borderColor='rgba(0,229,255,0.25)';
+      mediaBadge.style.color='var(--c-cyan)';
+    } else {
+      el=document.createElement('img');
+      el.src=url;
+      el.alt='Instagram Media';
+      el.style.width='100%';
+      el.style.maxHeight='420px';
+      el.style.objectFit='contain';
+      el.style.background='#000';
+      el.onerror=function(){showError('Could not load media preview.')};
+      mediaBadge.textContent='Image';
+      mediaBadge.style.background='rgba(162,89,255,0.1)';
+      mediaBadge.style.borderColor='rgba(162,89,255,0.25)';
+      mediaBadge.style.color='var(--c-neon)';
+    }
+    previewBox.appendChild(el);
+    currentMediaUrl=url;
+    currentMediaType=type;
+    previewArea.classList.add('show');
+  }
+
+  function doFetch(){
+    hideError();
+    clearPreview();
+    var raw=urlInput.value.trim();
+    if(!raw){showError('Please enter an Instagram URL.');return}
+    if(raw.indexOf('instagram.com')===-1){showError('Please enter a valid Instagram URL.');return}
+    fetchBtn.disabled=true;
+    showLoader();
+    var apiUrl='https://mixy-ox-enjoy.vercel.app/?url='+encodeURIComponent(raw);
+    fetch(apiUrl)
+      .then(function(r){
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        return r.json();
+      })
+      .then(function(data){
+        hideLoader();
+        fetchBtn.disabled=false;
+        var result=extractMedia(data);
+        if(!result.url){showError('No media found. Check if the post is public.');return}
+        renderPreview(result.url,result.type,result.thumb);
+      })
+      .catch(function(err){
+        hideLoader();
+        fetchBtn.disabled=false;
+        showError('Could not fetch media. The post may be private or the URL is invalid.');
+      });
+  }
+
+  fetchBtn.addEventListener('click',doFetch);
+  urlInput.addEventListener('keydown',function(e){if(e.key==='Enter')doFetch()});
+  urlInput.addEventListener('input',function(){hideError()});
+
+  dlBtn.addEventListener('click',function(){
+    if(!currentMediaUrl)return;
+    var ts=Date.now();
+    var fname='IGD_OX_'+ts+(currentMediaType==='video'?'.mp4':'.jpg');
+    fetch(currentMediaUrl)
+      .then(function(r){return r.blob()})
+      .then(function(blob){
+        var burl=URL.createObjectURL(blob);
+        var a=document.createElement('a');
+        a.href=burl;
+        a.download=fname;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){URL.revokeObjectURL(burl);a.remove()},500);
+      })
+      .catch(function(){
+        var a=document.createElement('a');
+        a.href=currentMediaUrl;
+        a.download=fname;
+        a.target='_self';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+  });
+})();
+</script>
+</body>
+</html>
